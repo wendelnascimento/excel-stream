@@ -1,5 +1,5 @@
 {
-  "name": "xlsx-stream",
+  "name": "xls-stream",
   "description": "convert a stream of xls or xlsx into json on the command line or in node",
   "version": "1.1.2",
   "bin": "index.js",

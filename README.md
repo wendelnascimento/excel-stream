@@ -9,7 +9,7 @@ A stream that converts excel spreadsheets into JSON object arrays.
 
 ``` js
 // stream rows from the first sheet on the file
-var excel = require('xlsx-stream')
+var excel = require('xls-stream')
 var fs = require('fs')
 
 fs.createReadStream('accounts.xlsx')
@@ -20,7 +20,7 @@ fs.createReadStream('accounts.xlsx')
 
 ``` js
 // stream rows from the sheet named 'Your sheet name'
-var excel = require('xlsx-stream')
+var excel = require('xls-stream')
 var fs = require('fs')
 
 fs.createReadStream('accounts.xlsx')
@@ -41,8 +41,8 @@ The `options` object may have the same properties as [csv-stream](https://www.np
 # Usage
 
 ``` js
-npm install -g excel-stream
-excel-stream < accounts.xlsx > account.json
+npm install -g xls-stream
+xls-stream < accounts.xlsx > account.json
 ```
 
 # options
@@ -50,7 +50,7 @@ excel-stream < accounts.xlsx > account.json
 newline delimited json:
 
 ```js
-excel-stream --newlines
+xls-stream --newlines
 ```
 
 # formats
