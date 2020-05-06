@@ -36,11 +36,11 @@ module.exports = function (options) {
   var write = fs.createWriteStream(filename)
     .on('close', function () {
       if (options.allSheets) {
-        var childCount = spawn(require.resolve('j/bin/j.njs'), `--list-sheets ${filename}`);
+        var childCount = spawn(require.resolve('j/bin/j.njs'), ['--list-sheets', filename]);
         childCount.stdout
           .pipe(eventStream.split())
           .pipe(eventStream.mapSync((sheetName) => {
-            getSheet(`--sheet ${sheetName} ${filename}`);
+            getSheet(['--sheet', sheetName, filename]);
           }))
       } else {
         getSheet(spawnArgs)
