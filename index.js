@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
-var fs       = require('fs')
-var os       = require('os')
-var path     = require('path')
-var chpro    = require('child_process')
+var fs       = require('fs');
+var os       = require('os');
+var path     = require('path');
+var chpro    = require('child_process');
 
-var through  = require('through')
-var csv      = require('csv-stream')
-var osenv    = require('osenv')
-var duplexer = require('duplexer')
-var concat   = require('concat-stream')
+var through  = require('through');
+var csv      = require('csv-stream');
+var osenv    = require('osenv');
+var duplexer = require('duplexer');
+var concat   = require('concat-stream');
+var eventStream = require('event-stream');
 
 var spawn = chpro.spawn
 if (os.type() === 'Windows_NT') spawn = require('win-spawn')
@@ -30,27 +31,41 @@ module.exports = function (options) {
 
   spawnArgs.push(filename)
 
+  var _data = {}
+
   var write = fs.createWriteStream(filename)
     .on('close', function () {
-      var child = spawn(require.resolve('j/bin/j.njs'), spawnArgs)
-      child.stdout.pipe(csv.createStream(options))
-        .pipe(through(function (data) {
-          var _data = {}
-          for(var k in data) {
-            var value = data[k].trim()
-            _data[k.trim()] = isNaN(value) ? value : +value
-          }
-          this.queue(_data)
-        }))
-        .pipe(read)
-      child.on('exit', function(code, sig) {
-        if(code === null || code !== 0) {
-          child.stderr.pipe(concat(function(errstr) {
-            duplex.emit('error', new Error(errstr))
+      if (options.allSheets) {
+        var childCount = spawn(require.resolve('j/bin/j.njs'), `--list-sheets ${filename}`);
+        childCount.stdout
+          .pipe(eventStream.split())
+          .pipe(eventStream.mapSync((sheetName) => {
+            getSheet(`--sheet ${sheetName} ${filename}`);
           }))
-        }
-      })
+      } else {
+        getSheet(spawnArgs)
+      }
     })
+
+  function getSheet(childSpawnArgs) {
+    var child = spawn(require.resolve('j/bin/j.njs'), childSpawnArgs)
+    child.stdout.pipe(csv.createStream(options))
+      .pipe(through(function (data) {
+        for (var k in data) {
+          var value = data[k].trim()
+          _data[k.trim()] = isNaN(value) ? value : +value
+        }
+        this.queue(_data)
+      }))
+      .pipe(read)
+    child.on('exit', function (code, sig) {
+      if (code === null || code !== 0) {
+        child.stderr.pipe(concat(function (errstr) {
+          duplex.emit('error', new Error(errstr))
+        }))
+      }
+    })
+  }
 
   return (duplex = duplexer(write, read))
 

@@ -13,6 +13,7 @@
     "concat-stream": "^1.4.6",
     "csv-stream": "0.2.0",
     "duplexer": "~0.1.1",
+    "event-stream": "^4.0.1",
     "j": "^0.4.3",
     "minimist": "^1.1.1",
     "osenv": "^0.1.3",
