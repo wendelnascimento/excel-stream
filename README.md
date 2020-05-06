@@ -1,4 +1,6 @@
-# excel-stream
+This project is a fork from https://github.com/dominictarr/excel-stream and i've just updated the csv-stream library to be compatible with newer node versions
+
+# xlsx-stream
 
 A stream that converts excel spreadsheets into JSON object arrays.
 
@@ -7,7 +9,7 @@ A stream that converts excel spreadsheets into JSON object arrays.
 
 ``` js
 // stream rows from the first sheet on the file
-var excel = require('excel-stream')
+var excel = require('xlsx-stream')
 var fs = require('fs')
 
 fs.createReadStream('accounts.xlsx')
@@ -18,7 +20,7 @@ fs.createReadStream('accounts.xlsx')
 
 ``` js
 // stream rows from the sheet named 'Your sheet name'
-var excel = require('excel-stream')
+var excel = require('xlsx-stream')
 var fs = require('fs')
 
 fs.createReadStream('accounts.xlsx')
