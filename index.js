@@ -20,7 +20,7 @@ module.exports = function (options) {
   var read = through()
   var duplex
 
-  var filename = path.join(osenv.tmpdir(), '_'+Date.now())
+  var filename = path.join(osenv.tmpdir(), '_' + Date.now())
 
   var spawnArgs = []
 
@@ -36,28 +36,37 @@ module.exports = function (options) {
   var write = fs.createWriteStream(filename)
     .on('close', function () {
       if (options.allSheets) {
-        var childCount = spawn(require.resolve('j/bin/j.njs'), ['--list-sheets', filename]);
+        let streams = [];
+        var childCount = spawn(require.resolve('xlsx/bin/xlsx.njs'), ['--list-sheets', filename]);
         childCount.stdout
           .pipe(eventStream.split())
+          .pipe(eventStream.filterSync(sheetName => sheetName))
           .pipe(eventStream.mapSync((sheetName) => {
-            getSheet(['--sheet', sheetName, filename]);
+            return getSheet(['--sheet', sheetName, filename]);
           }))
+          .pipe(eventStream.mapSync((item) => {
+            streams.push(item);
+            return item;
+          }))
+          .on('end', () => {
+            eventStream.merge(streams)
+              .pipe(through(function (data) {
+                for (var k in data) {
+                  var value = data[k].trim()
+                  _data[k.trim()] = isNaN(value) ? value : +value
+                }
+                this.queue(_data)
+              }))
+              .pipe(read);
+          })
       } else {
         getSheet(spawnArgs)
       }
     })
 
   function getSheet(childSpawnArgs) {
-    var child = spawn(require.resolve('j/bin/j.njs'), childSpawnArgs)
-    child.stdout.pipe(csv.createStream(options))
-      .pipe(through(function (data) {
-        for (var k in data) {
-          var value = data[k].trim()
-          _data[k.trim()] = isNaN(value) ? value : +value
-        }
-        this.queue(_data)
-      }))
-      .pipe(read)
+    var child = spawn(require.resolve('xlsx/bin/xlsx.njs'), childSpawnArgs)
+
     child.on('exit', function (code, sig) {
       if (code === null || code !== 0) {
         child.stderr.pipe(concat(function (errstr) {
@@ -65,6 +74,7 @@ module.exports = function (options) {
         }))
       }
     })
+    return child.stdout.pipe(csv.createStream(options))
   }
 
   return (duplex = duplexer(write, read))
@@ -72,7 +82,7 @@ module.exports = function (options) {
 }
 
 
-if(!module.parent) {
+if (!module.parent) {
   var JSONStream = require('JSONStream')
   var args = require('minimist')(process.argv.slice(2))
   process.stdin
