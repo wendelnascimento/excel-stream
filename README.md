@@ -1,6 +1,6 @@
 This project is a fork from https://github.com/dominictarr/excel-stream and i've just updated the csv-stream library to be compatible with newer node versions
 
-# xlsx-stream
+# xls-stream
 
 A stream that converts excel spreadsheets into JSON object arrays.
 
@@ -37,7 +37,7 @@ The `options` object may have the same properties as [csv-stream](https://www.np
 
  * `sheet`: the name of the sheet you want to stream. Case sensitive.
  * `sheetIndex`: the sheet number you want to stream (0-based).
- * `allSheets`: boolean indicating if all sheets shoulb be used instead of just the one provided with the sheetIndex or sheet argument. If allSheets is true, sheetIndex and sheet arguments will be ignored
+ * `allSheets`: boolean indicating if all sheets should be used instead of just the one provided with the `sheetIndex` or `sheet` argument. If `allSheets` is true then `sheetIndex` and `sheet` arguments will be ignored
 
 # Usage
 
