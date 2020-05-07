@@ -83,7 +83,7 @@ will become
 
 So, excel isn't really a streamable format.
 But it's easy to work with streams because everything is a stream.
-This writes to a tmp file, then pipes it through the unfortunately named [j](https://npm.im/j)
+This writes to a tmp file, then pipes it through [xlsx](https://npm.im/xlsx)
 then into [csv-stream](https://npm.im/csv-stream)
 
 
